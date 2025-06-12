@@ -10,7 +10,7 @@ permissions:
   contents: read
   pages: write
   id-token: write 
-  
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -23,4 +23,8 @@ jobs:
           cp -r data public/
       - uses: actions/upload-pages-artifact@v3
         with: { path: public }
+      - name: Debug ENV
+        run: |
+          echo "ID_TOKEN env: $ACTIONS_ID_TOKEN_REQUEST_URL"
+
       - uses: actions/deploy-pages@v4
