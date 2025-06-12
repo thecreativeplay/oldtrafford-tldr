@@ -1,6 +1,10 @@
 # timer + Python runner → fetches feeds, de-dupes, writes data/news.json, commits
 
 name: ingest
+
+permissions: 
+  contents: write 
+
 on:
   schedule:           # every 10 min
     - cron: '*/10 * * * *'
@@ -18,10 +22,12 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: python ingest/ingest.py
-      - name: Commit output
+      - name: Commit & push
         run: |
           git config --global user.name  "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/news.json
-          git commit -m "auto: update news" || echo "no changes"
-          git push
+          git commit -m "auto: update news feed" || echo "no changes"
+          # ≤-- use the token GitHub already provides
+          git push https://x-access-token:${{ github.token }}@github.com/${{ github.repository }} HEAD:${{ github.ref_name }}
+
