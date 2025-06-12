@@ -1,6 +1,6 @@
 #redeploys the static site after every push
 permissions:
-  content: write
+  contents: write
 name: deploy-pages
 on:
   push:
