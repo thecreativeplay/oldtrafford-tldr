@@ -1,0 +1,27 @@
+# timer + Python runner → fetches feeds, de-dupes, writes data/news.json, commits
+
+name: ingest
+on:
+  schedule:           # every 10 min
+    - cron: '*/10 * * * *'
+  workflow_dispatch:  # manual Run button
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - name: Install deps
+        run: pip install -r ingest/requirements.txt
+      - name: Run ingest
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python ingest/ingest.py
+      - name: Commit output
+        run: |
+          git config --global user.name  "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/news.json
+          git commit -m "auto: update news" || echo "no changes"
+          git push
