@@ -1,18 +1,18 @@
 #redeploys the static site after every push
 
 name: deploy-pages
-
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main" ] # Or your primary branch
   workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    permissions: 
-      contents: read
-      pages: write
+    # THIS IS THE CRUCIAL PART YOU'RE MISSING OR HAVE MISPLACED
+    permissions: # <--- This block must be here, indented under 'deploy:'
+      contents: read   # Required to checkout the repository
+      pages: write     # Required to push to the gh-pages branch (this is for peaceiris)
 
     steps:
       - uses: actions/checkout@v4
@@ -28,4 +28,3 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public
-
