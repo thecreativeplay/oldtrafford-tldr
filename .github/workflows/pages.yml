@@ -1,4 +1,4 @@
-#redeploys the static site after every push
+# redeploys the static site after every push
 permissions:
   contents: write
 name: deploy-pages
@@ -10,7 +10,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    # THIS IS THE CRUCIAL PART YOU'RE MISSING OR HAVE MISPLACED
     permissions: # <--- This block must be here, indented under 'deploy:'
       contents: read   # Required to checkout the repository
       pages: write     # Required to push to the gh-pages branch (this is for peaceiris)
@@ -23,6 +22,9 @@ jobs:
           mkdir public
           cp -r web/* public/
           cp -r data public/
+
+      - name: List files in public directory
+        run: ls -la public
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
