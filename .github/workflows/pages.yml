@@ -1,11 +1,13 @@
 # redeploys the static site after every push
 permissions:
-  contents: write
+  contents: write # This top-level permission grants write access for the entire workflow.
+                  # It can be more restrictive if only needed by specific jobs.
+
 name: deploy-pages
 on:
   push:
     branches: [ "main" ] # Or your primary branch
-  workflow_dispatch:
+  workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
   deploy:
@@ -13,21 +15,33 @@ jobs:
     permissions: # <--- This block must be here, indented under 'deploy:'
       contents: read   # Required to checkout the repository
       pages: write     # Required to push to the gh-pages branch (this is for peaceiris)
+      id-token: write  # Required for OpenID Connect (OIDC) which is used by actions/deploy-pages@v1
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4 # Use the latest stable version for checkout
 
       - name: Build static site
         run: |
-          mkdir public
+          # Create the public directory if it doesn't exist (mkdir -p ensures no error if it does)
+          mkdir -p public
+          # Copy content from 'web' and 'data' directories into 'public'
           cp -r web/* public/
           cp -r data public/
 
-      - name: List files in public directory
-        run: ls -la public
+      - name: List files in public directory for debugging
+        run: ls -la public # Helps verify that files are copied correctly
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        # Use the latest stable version of peaceiris/actions-gh-pages
+        # v4 is the current recommended version for better compatibility and features.
+        uses: peaceiris/actions-gh-pages@v4
         with:
+          # Use the GitHub token provided by the workflow environment
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          # Specify the directory to publish. This is the output of your build process.
           publish_dir: ./public
+          # Optional: Add a custom commit message for the deployment
+          # commit_message: "Deployed via GitHub Actions"
+          # Optional: Configure the branch to deploy to (defaults to gh-pages)
+          # publish_branch: gh-pages
