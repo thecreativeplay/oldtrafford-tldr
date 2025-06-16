@@ -13,7 +13,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     permissions: # <--- This block must be here, indented under 'deploy:'
-      contents: read   # Required to checkout the repository
+      contents: write  # Added for broader write access for git operations
       pages: write     # Required to push to the gh-pages branch (this is for peaceiris)
       id-token: write  # Required for OpenID Connect (OIDC) which is used by actions/deploy-pages@v1
 
