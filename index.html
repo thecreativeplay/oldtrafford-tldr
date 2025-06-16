@@ -10,7 +10,7 @@ A no-framework HTML page that fetches the JSON and renders cards.
 <h1>OldTrafford-TL;DR</h1>
 <div id="feed">Loading…</div>
 <script>
-fetch("./data/news.json").then(r=>r.json()).then(items=>{
+fetch("data/news.json").then(r=>r.json()).then(items=>{
   feed.innerHTML = items.map(n=>`
     <article style="border-bottom:1px solid #ddd;padding:1rem 0">
       <h2><a href="${n.url}" target="_blank">${n.title}</a></h2>
