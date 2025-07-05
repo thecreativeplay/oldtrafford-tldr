@@ -42,6 +42,22 @@ def main():
             continue
 
         for e in parsed.entries:
+            # Try to extract image URL
+            image = None
+
+            # Standard RSS media fields
+            if "media_content" in e and len(e.media_content) > 0:
+                image = e.media_content[0].get("url")
+
+            elif "media_thumbnail" in e and len(e.media_thumbnail) > 0:
+                image = e.media_thumbnail[0].get("url")
+
+            # Optional fallback: scrape from <img> tag in description
+            elif "description" in e:
+                match = re.search(r'<img[^>]+src="([^">]+)"', e.description)
+                if match:
+                    image = match.group(1)
+
             body = (e.get("summary") or e.get("description") or "")
             if not isinstance(body, str) or not body.strip():
                 continue
