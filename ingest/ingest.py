@@ -2,12 +2,12 @@
 Reads RSS, strips exact/near duplicates (cos ≥ 0.95), writes one clean list.
 Keeps state only for this run—simple for a personal site.
 '''
-
-import feedparser, json, hashlib, datetime as dt
+import feedparser, json, hashlib, datetime as dt, torch
 from pathlib import Path
 from sentence_transformers import SentenceTransformer, util
+from dateutil import parser as dateparser
 
-FEEDS = {                             # ⬅ add more RSS feeds anytime
+FEEDS = {
     "BBC MU": "https://www.bbc.co.uk/sport/football/teams/manchester-united/rss.xml",
     "MEN":     "https://www.manchestereveningnews.co.uk/all-about/manchester-united-fc/?service=rss",
 }
@@ -18,23 +18,38 @@ def sha(txt): return hashlib.sha256(txt.encode()).hexdigest()
 def summarise(txt): return txt[:300]+"…" if len(txt)>300 else txt
 
 def main():
+    Path("data").mkdir(parents=True, exist_ok=True)
     seen_sha, vecs, news = set(), [], []
+
     for src, url in FEEDS.items():
-        for e in feedparser.parse(url).entries:
+        parsed = feedparser.parse(url)
+        if parsed.bozo:
+            print(f"Warning: Could not parse feed {src}: {parsed.bozo_exception}")
+            continue
+
+        for e in parsed.entries:
             body = (e.get("summary") or e.get("description") or "")
+            if not isinstance(body, str) or not body.strip():
+                continue
+
             if (h := sha(body)) in seen_sha: continue
             seen_sha.add(h)
 
-            v = MODEL.encode(body, normalize_embeddings=True)
+            v = torch.tensor(MODEL.encode(body, normalize_embeddings=True))
             if any(util.cos_sim(v, w).item() >= SIM for w in vecs): continue
             vecs.append(v)
 
+            try:
+                published = dateparser.parse(e.published).isoformat()
+            except:
+                published = dt.datetime.utcnow().isoformat()
+
             news.append({
                 "title": e.title, "url": e.link, "source": src,
-                "published": e.get("published",
-                                   dt.datetime.utcnow().isoformat()),
+                "published": published,
                 "summary": summarise(body)
             })
+
     news.sort(key=lambda n: n["published"], reverse=True)
     Path("data/news.json").write_text(json.dumps(news, indent=2))
     print("Wrote", len(news), "stories")
