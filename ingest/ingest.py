@@ -75,10 +75,14 @@ def main():
                 published = dt.datetime.utcnow().isoformat()
 
             news.append({
-                "title": e.title, "url": e.link, "source": src,
+                "title": e.title,
+                "url": e.link,
+                "source": src,
                 "published": published,
-                "summary": summarise(body)
+                "summary": summarise(body),
+                "image": image  # ← this is the missing key!
             })
+
 
     news.sort(key=lambda n: dateparser.parse(n["published"]), reverse=True)
     Path("data/news.json").write_text(json.dumps(news, indent=2))
