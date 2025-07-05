@@ -2,18 +2,43 @@
 <!doctype html>
 <html><meta charset="utf-8">
 <title>OldTrafford-TL;DR</title>
-<body style="font-family:system-ui;max-width:52rem;margin:auto;padding:2rem">
+<body style="
+  font-family: system-ui, sans-serif;
+  background: #f8f9fa;
+  color: #111;
+  max-width: 720px;
+  margin: auto;
+  padding: 2rem;
+  line-height: 1.6;
+">
+
 <h1>OldTrafford-TL;DR</h1>
 <div id="feed">Loading…</div>
 <script>
 fetch("data/news.json").then(r=>r.json()).then(items=>{
   items.sort((a, b) => new Date(b.published) - new Date(a.published)); // ← SORT newest first
-  feed.innerHTML = items.map(n=>`
-    <article style="border-bottom:1px solid #ddd;padding:1rem 0">
-      <h2><a href="${n.url}" target="_blank">${n.title}</a></h2>
-      <p>${new Date(n.published).toLocaleString()} — ${n.source}</p>
-      <p>${n.summary}</p>
-    </article>`).join('')
+  feed.innerHTML = items.map(n => `
+  <article style="
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  ">
+    <h2 style="margin: 0 0 0.25rem">
+      <a href="${n.url}" target="_blank" style="color: #b80000; text-decoration: none;">
+        ${n.title}
+      </a>
+    </h2>
+    <p style="font-size: 0.9rem; color: #555; margin: 0.25rem 0 0.75rem;">
+      ${new Date(n.published).toLocaleString()} — ${n.source}
+    </p>
+    <p style="color: #222;">${n.summary}</p>
+  </article>
+`).join('');
+
+
 }).catch(e=>feed.textContent=e);
 </script>
 </body></html>
