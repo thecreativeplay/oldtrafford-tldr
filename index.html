@@ -10,17 +10,83 @@
         font-family: 'Inter', system-ui, sans-serif;
         background: #f8f9fa;
         color: #111;
-        max-width: 720px;
         margin: auto;
         padding: 2rem;
         line-height: 1.6;
+      }
+
+      #layout {
+        display: flex;
+        align-items: flex-start;
+        gap: 2rem;
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      #feed {
+        flex: 1;
+      }
+
+      #twitter-sidebar {
+        width: 300px;
+        max-height: 90vh;
+        overflow-y: auto;
+        background: white;
+        border-left: 1px solid #ccc;
+        padding: 10px;
+        box-shadow: 0 0 5px rgba(0,0,0,0.05);
+        border-radius: 8px;
+      }
+
+      @media (max-width: 900px) {
+        #layout {
+          flex-direction: column;
+        }
+
+        #twitter-sidebar {
+          width: 100%;
+          border-left: none;
+          border-top: 1px solid #ccc;
+          margin-top: 2rem;
+        }
       }
     </style>
   </head>
   <body>
     <h1>OldTrafford-TL;DR</h1>
-    <div id="feed">Loading…</div>
 
+    <!-- ⬇️ Wrap feed + sidebar into layout container -->
+    <div id="layout">
+      <!-- 🔴 News feed column -->
+      <div id="feed">Loading…</div>
+
+      <!-- 🟢 Twitter sidebar column -->
+      <div id="twitter-sidebar">
+        <h3>🔁 Transfer Alerts</h3>
+
+        <h4>Fabrizio Romano – "Here we go"</h4>
+        <iframe
+          src="https://nitter.kavin.rocks/search?f=tweets&q=from%3AFabrizioRomano+%22here+we+go%22"
+          width="100%"
+          height="400"
+          style="border:none;"
+          sandbox="allow-same-origin allow-scripts allow-popups"
+          title="Fabrizio Here We Go">
+        </iframe>
+
+        <h4>David Ornstein – Confirmed</h4>
+        <iframe
+          src="https://nitter.kavin.rocks/search?f=tweets&q=from%3ADavid_Ornstein+confirmed"
+          width="100%"
+          height="400"
+          style="border:none;"
+          sandbox="allow-same-origin allow-scripts allow-popups"
+          title="Ornstein Confirmed">
+        </iframe>
+      </div>
+    </div>
+
+    <!-- 🧠 JS to populate the news feed -->
     <script>
     fetch("data/news.json").then(r => r.json()).then(items => {
       items.sort((a, b) => new Date(b.published) - new Date(a.published)); // newest first
@@ -60,32 +126,6 @@
       `).join('');
     }).catch(e => feed.textContent = e);
     </script>
-
-
-    <!-- 🔁 Twitter Transfer Sidebar (Nitter Embedded) -->
-    <div id="twitter-sidebar">
-      <h3>🔁 Transfer Alerts</h3>
-
-      <h4>Fabrizio Romano – "Here we go"</h4>
-      <iframe
-        src="https://nitter.net/search?f=tweets&q=from%3AFabrizioRomano+%22here+we+go%22"
-        width="100%"
-        height="400"
-        style="border:none;"
-        sandbox="allow-same-origin allow-scripts allow-popups"
-        title="Fabrizio Here We Go">
-      </iframe>
-
-      <h4>David Ornstein – Confirmed</h4>
-      <iframe
-        src="https://nitter.net/search?f=tweets&q=from%3ADavid_Ornstein+confirmed"
-        width="100%"
-        height="400"
-        style="border:none;"
-        sandbox="allow-same-origin allow-scripts allow-popups"
-        title="Ornstein Confirmed">
-      </iframe>
-    </div>
-    
   </body>
 </html>
+
